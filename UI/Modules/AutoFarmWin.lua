@@ -23,7 +23,6 @@ local StagePositions = {
     [120] = { AreaPos = Vector3.new(5249.88, 4.03, 1578.52), WinPos = Vector3.new(5239.13, 8.76, 1592.87) }
 }
 
--- Função de deslizar (Glide)
 local function GlideTo(targetPosition, speed)
     local character = LocalPlayer.Character
     if not character then return end
@@ -46,15 +45,23 @@ local function GlideTo(targetPosition, speed)
     tween.Completed:Wait()
 end
 
-function AutoFarm.FarmStage(currentStage, targetStage)
+-- Função chamada no loop principal dentro do main.lua
+function AutoFarm.Execute(flags, currentStage)
+    -- Se o botão de AutoFarm estiver DESLIGADO, interrompe imediatamente
+    if not flags or not flags.AutoFarm then
+        return
+    end
+
+    local targetStage = flags.TargetStage or 120
     local data = StagePositions[currentStage]
+    
     if not data then return end
 
-    -- 1. Se ainda não é o estágio final selecionado: desliza para a área e continua
+    -- 1. Se ainda não chegou no estágio alvo: desliza para a área e continua
     if currentStage < targetStage then
         GlideTo(data.AreaPos)
         
-    -- 2. Se chegou no estágio final desejado: desliza para a área e depois vai para a almofada de vitória
+    -- 2. Se chegou no estágio final desejado: desliza para a área e depois coleta a almofada de vitória
     elseif currentStage == targetStage then
         GlideTo(data.AreaPos)
         task.wait(0.2)
